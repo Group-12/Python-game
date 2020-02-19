@@ -1,9 +1,8 @@
-#Main file
 import simplegui,random
 from user304_rsf8mD0BOQ_1 import Vector
 
-CANVAS_WIDTH = 200
-CANVAS_HEIGHT = 200
+CANVAS_WIDTH = 500
+CANVAS_HEIGHT = 500
 interval = 100
 
 def randCol ():
@@ -43,30 +42,26 @@ class Ball:
     def update(self):
         self.pos=self.pos.add(self.vel)
 
-position = [50, 50]
+
+def RandPosX():
+    return random.randrange(0, CANVAS_WIDTH)
+def RandPosY():
+    return random.randrange(0, CANVAS_HEIGHT)
+
 
 balls = []
-
 
 def tick():
     """
     Timer handler
     """
-    xpos = random.randrange(0, CANVAS_WIDTH)
-    ypos = random.randrange(0, CANVAS_HEIGHT)
-    position[0] = xpos
-    position[1] = ypos
-    #print ("true")
-
     balls.append(Ball)
-
 
 
 for obj in balls:
     print("obj")
 
-ball = Ball(Vector(CANVAS_WIDTH/2, CANVAS_HEIGHT/2),Vector(vel_x(), vel_y()), radius_random(), randCol ())
-
+ball = Ball(Vector(RandPosX(), RandPosY()),Vector(vel_x(), vel_y()), radius_random(), randCol ())
 
 
 # Create a frame and assign the callback to the event handler
