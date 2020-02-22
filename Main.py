@@ -1,5 +1,16 @@
-import simplegui,random
-from user304_rsf8mD0BOQ_1 import Vector
+'''
+https://py3.codeskulptor.org/#user305_7mUid7UcUN_2.py
+'''
+
+import SimpleGUICS2Pygame.simpleguics2pygame as simplegui
+
+from Vector import Vector
+#control + BREAK to kill process, control + C does not work
+
+import random
+
+#import simplegui
+#from user304_rsf8mD0BOQ_1 import Vector
 
 CANVAS_WIDTH = 500
 CANVAS_HEIGHT = 500
@@ -17,10 +28,10 @@ def radius_random():
         return random.randint(10,50)
 
 def vel_x():
-    return random.randint(-5,5)
+    return random.randint(-2,2)
 
 def vel_y():
-    return random.randint(-5,5)
+    return random.randint(-2,2)
 
 
 class Ball:
@@ -51,6 +62,9 @@ def RandPosY():
 
 balls = []
 
+ballif = 2
+
+
 def tick():
     """
     Timer handler
@@ -61,12 +75,13 @@ def tick():
 for obj in balls:
     print("obj")
 
-ball = Ball(Vector(RandPosX(), RandPosY()),Vector(vel_x(), vel_y()), radius_random(), randCol ())
+
+ball1 = Ball(Vector(RandPosX(), RandPosY()),Vector(vel_x(), vel_y()), radius_random(), randCol ())
 
 
 # Create a frame and assign the callback to the event handler
 frame = simplegui.create_frame(" Colours ", CANVAS_WIDTH , CANVAS_HEIGHT)
-frame.set_draw_handler(ball.draw)
+frame.set_draw_handler(ball1.draw)
 
 timer = simplegui.create_timer(interval, tick)
 
