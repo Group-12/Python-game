@@ -34,17 +34,13 @@ def vel_y():
     return random.randint(-2,2)
 
 class Wall:
-    def __init__(self, border, color, side):
+    def __init__(self, border, color):
         self.border = border
         self.color = color
         self.normal = Vector(1,0)
-        self.side = side
-    #    if userinput == 'r':
-        self.x1 = 600
-    #    elif userinput == 'l':
-        self.x2 = 0
-    #    else:
-    #        print('error')
+
+        self.x = CANVAS_WIDTH
+
         self.edge_r = self.x + self.border
 
     def draw(self, canvas):
@@ -54,17 +50,9 @@ class Wall:
                          self.color)
 
     def hit(self, ball):
-        if userinput == 'l':
-            h = (ball.offset_l() <= self.edge_r)
+        #    h = (self.ball.offset_l() <= self.edge_r)
+            h = (balls.offset_l() >= self.edge_r - 50)
             return h
-        elif userinput == 'r':
-            h = (ball.offset_l() >= self.edge_r - 50)
-            return h
-        else:
-            print('error')
-
-
-
 
 class Ball:
     def __init__(self,pos, vel, radius, color):
@@ -73,6 +61,10 @@ class Ball:
         self.radius =radius
         self.color = color
         self.border = 1
+
+    def offset_l(self):
+        return self.pos.x - self.radius
+
 
     def draw(self,canvas):
         canvas.draw_circle(self.pos.get_p(),
@@ -85,6 +77,9 @@ class Ball:
     def update(self):
         self.pos=self.pos.add(self.vel)
 
+    def bounce(self, normal):
+        self.vel.reflect(normal)
+
 
 def RandPosX():
     return random.randrange(0, CANVAS_WIDTH)
@@ -93,8 +88,9 @@ def RandPosY():
 
 
 class Interaction:
-    def __init__(self, balls):
+    def __init__(self, balls, walls):
         self.balls = balls
+        self.walls = walls
         self.in_collision = set()
 
     def hit(self, b1, b2):
@@ -124,8 +120,16 @@ class Interaction:
             self.in_collision.discard((b2, b1))
 
     def update(self):
-        for ball in self.balls:
-            ball.update()
+    #    for ball in self.balls:
+    #        ball.update()
+
+        if self.walls.hit(self.balls):
+            if not self.in_collision:
+                self.ball.bounce(self.wall.normal)
+                self.in_collision = True
+        else:
+            self.in_collision = False
+            self.ball.update()
 
         for ball1 in self.balls:
             for ball2 in self.balls:
@@ -136,41 +140,39 @@ class Interaction:
         self.update()
         for ball in self.balls:
             ball.draw(canvas)
-
+            self.walls.draw(canvas)
 
 
 balls = []
 
-ballif = 2
-
-
-def tick():
-    """
-    Timer handler
-    """
-    balls.append(Ball)
-
-
 for obj in balls:
     print("obj")
 
+def timer_handler():
+    pass
 
 num_balls = 100
 for i in range(num_balls):
-    balls.append(Ball(Vector(RandPosX(), RandPosY()),Vector(vel_x(), vel_y()), radius_random(), randCol ()))
+#   def timer_handler():
+        balls.append(Ball(Vector(RandPosX(), RandPosY()),Vector(vel_x(), vel_y()), radius_random(), randCol ()))
 
-#ball1 = Ball(Vector(RandPosX(), RandPosY()),Vector(vel_x(), vel_y()), radius_random(), randCol ())
+
+timer = simplegui.create_timer(100, timer_handler)
+print(timer.is_running())
+timer.start()
+print(timer.is_running())
+timer.stop()
+print(timer.is_running())
 
 
-interaction = Interaction(balls)
+w = Wall(5, 'red')
 
+
+interaction = Interaction(balls, w)
 
 # Create a frame and assign the callback to the event handler
 frame = simplegui.create_frame(" Colours ", CANVAS_WIDTH , CANVAS_HEIGHT)
 frame.set_draw_handler(interaction.draw)
+#frame.set_draw_handler(w.draw)
 
-timer = simplegui.create_timer(interval, tick)
-
-# Start the frame animation
-frame.start ()
-timer.start()
+frame.start()
