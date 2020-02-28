@@ -25,13 +25,102 @@ def randCol ():
         return 'rgb('+str(r)+ ','+str(g)+ ','+str(b)+ ')'
 
 def radius_random():
-        return random.randint(1,10)
+        return random.randint(3,20)
 
 def vel_x():
     return random.randint(-2,2)
 
 def vel_y():
     return random.randint(-2,2)
+
+
+class Player:
+    def __init__(self, pos, radius=10):
+        self.pos = pos
+        self.vel = Vector()
+        self.radius = max(radius, 10)
+        self.colour = 'White'
+
+    def draw(self, canvas):
+        #canvas.draw_circle(self.pos.get_p(), self.radius, 1, self.colour, self.colour)
+
+        print(self.pos.get_p())
+
+        canvas.draw_circle(self.pos.get_p(), self.radius, 1, self.colour, self.colour)
+        '''
+        if self.pos.get_p() > (WIDTH, HEIGHT): #Right
+            self.pos.subtract(Vector(500, 0))
+            canvas.draw_circle((0,HEIGHT-self.radius), self.radius, 1, self.colour, self.colour)
+
+        elif self.pos.get_p() < (-1,-1): #Left
+            self.pos.add(Vector(500,0))
+            canvas.draw_circle((0,HEIGHT-self.radius), self.radius, 1, self.colour, self.colour)
+        '''
+
+    def update(self):
+        self.pos.add(self.vel)
+        self.vel.multiply(0.85)
+
+class Keyboard:
+    def __init__(self):
+        self.left = False
+        self.right = False
+        self.up = False
+        self.down = False
+
+    def keyDown(self, key):
+        if key == simplegui.KEY_MAP['left']:
+            self.left = True
+
+        elif key == simplegui.KEY_MAP['right']:
+            self.right = True
+
+        elif key == simplegui.KEY_MAP['up']:
+            self.up = True
+
+        elif key == simplegui.KEY_MAP['down']:
+            self.down = True
+
+    def keyUp(self, key):
+        if key == simplegui.KEY_MAP['left']:
+            self.left = False
+
+        elif key == simplegui.KEY_MAP['right']:
+            self.right = False
+
+        elif key == simplegui.KEY_MAP['up']:
+            self.up = False
+
+        elif key == simplegui.KEY_MAP['down']:
+            self.down = False
+
+
+class KBInteraction:
+    def __init__(self, player, keyboard):
+        self.player = player
+        self.keyboard = keyboard
+
+    def update(self):
+        if self.keyboard.left:
+            self.player.vel.add(Vector(-1, 0))
+
+        elif self.keyboard.right:
+            self.player.vel.add(Vector(1, 0))
+
+        elif self.keyboard.up:
+            self.player.vel.add(Vector(0, -1))
+
+        elif self.keyboard.down:
+            self.player.vel.add(Vector(0, 1))
+
+
+    def draw(self, canvas):
+        inter.update()
+        Player.update()
+        Player.draw(canvas)
+
+
+
 
 class Wall:
     def __init__(self, border, color):
@@ -88,9 +177,9 @@ def RandPosY():
 
 
 class Interaction:
-    def __init__(self, balls, walls):
+    def __init__(self, balls):
         self.balls = balls
-        self.walls = walls
+        #self.walls = walls
         self.in_collision = set()
 
     def hit(self, b1, b2):
@@ -123,13 +212,13 @@ class Interaction:
     #    for ball in self.balls:
     #        ball.update()
 
-        if self.walls.hit(self.balls):
-            if not self.in_collision:
-                self.ball.bounce(self.wall.normal)
-                self.in_collision = True
-        else:
-            self.in_collision = False
-            self.ball.update()
+#        if self.walls.hit(self.balls):
+#            if not self.in_collision:
+#                self.ball.bounce(self.wall.normal)
+#                self.in_collision = True
+#        else:
+#            self.in_collision = False
+#            self.ball.update()
 
         for ball1 in self.balls:
             for ball2 in self.balls:
@@ -140,7 +229,7 @@ class Interaction:
         self.update()
         for ball in self.balls:
             ball.draw(canvas)
-            self.walls.draw(canvas)
+#            self.walls.draw(canvas)
 
 
 balls = []
@@ -165,14 +254,23 @@ timer.stop()
 print(timer.is_running())
 
 
+kbd = Keyboard()
+#Player = Player(Vector(CANVAS_WIDTH/2, CANVAS_HEIGHT-40), 40)
+Player = Player(Vector(0,0), 40)
+inter = KBInteraction(Player, kbd)
+
+
 w = Wall(5, 'red')
+b = Ball((Vector(300,0)), (Vector(1,1)), 20, 'blue')
+b = balls
 
-
-interaction = Interaction(balls, w)
+interaction = Interaction(b)
 
 # Create a frame and assign the callback to the event handler
 frame = simplegui.create_frame(" Colours ", CANVAS_WIDTH , CANVAS_HEIGHT)
-frame.set_draw_handler(interaction.draw)
+frame.set_draw_handler(inter.draw)
 #frame.set_draw_handler(w.draw)
+frame.set_keydown_handler(kbd.keyDown)
+frame.set_keyup_handler(kbd.keyUp)
 
 frame.start()
