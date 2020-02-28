@@ -44,7 +44,7 @@ class Player:
     def draw(self, canvas):
         #canvas.draw_circle(self.pos.get_p(), self.radius, 1, self.colour, self.colour)
 
-        print(self.pos.get_p())
+        #print(self.pos.get_p())
 
         canvas.draw_circle(self.pos.get_p(), self.radius, 1, self.colour, self.colour)
         '''
@@ -177,9 +177,13 @@ def RandPosY():
 
 
 class Interaction:
-    def __init__(self, balls):
+    def __init__(self, balls, keyboard, player):
         self.balls = balls
         #self.walls = walls
+        self.keyboard = Keyboard
+        self.player = player
+
+
         self.in_collision = set()
 
     def hit(self, b1, b2):
@@ -220,13 +224,34 @@ class Interaction:
 #            self.in_collision = False
 #            self.ball.update()
 
+
+        if self.keyboard.left:
+            self.player.vel.add(Vector(-1, 0))
+
+        elif self.keyboard.right:
+            self.player.vel.add(Vector(1, 0))
+
+        elif self.keyboard.up:
+            self.player.vel.add(Vector(0, -1))
+
+        elif self.keyboard.down:
+            self.player.vel.add(Vector(0, 1))
+
+
+
         for ball1 in self.balls:
             for ball2 in self.balls:
                 if ball1 != ball2:
                     self.collide(ball1, ball2)
 
     def draw(self, canvas):
-        self.update()
+
+        inter.update()
+        Player.update()
+        Player.draw(canvas)
+
+
+        #self.update()
         for ball in self.balls:
             ball.draw(canvas)
 #            self.walls.draw(canvas)
@@ -264,11 +289,11 @@ w = Wall(5, 'red')
 b = Ball((Vector(300,0)), (Vector(1,1)), 20, 'blue')
 b = balls
 
-interaction = Interaction(b)
+interaction = Interaction(b, kbd, Player)
 
 # Create a frame and assign the callback to the event handler
 frame = simplegui.create_frame(" Colours ", CANVAS_WIDTH , CANVAS_HEIGHT)
-frame.set_draw_handler(inter.draw)
+frame.set_draw_handler(interaction.draw)
 #frame.set_draw_handler(w.draw)
 frame.set_keydown_handler(kbd.keyDown)
 frame.set_keyup_handler(kbd.keyUp)
