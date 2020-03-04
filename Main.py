@@ -1,16 +1,13 @@
-'''
-https://py3.codeskulptor.org/#user305_7mUid7UcUN_2.py
-'''
-
+#### RUN ON WINDOWS ###
 import SimpleGUICS2Pygame.simpleguics2pygame as simplegui
-
 from Vector import Vector
 #control + BREAK to kill process, control + C does not work
 
-import random
-
+### RUN ON CODESKULPTOR ###
 #import simplegui
 #from user304_rsf8mD0BOQ_1 import Vector
+
+import random
 
 CANVAS_WIDTH = 500
 CANVAS_HEIGHT = 500
@@ -42,20 +39,9 @@ class Player:
         self.colour = 'White'
 
     def draw(self, canvas):
-        #canvas.draw_circle(self.pos.get_p(), self.radius, 1, self.colour, self.colour)
-
         #print(self.pos.get_p())
-
         canvas.draw_circle(self.pos.get_p(), self.radius, 1, self.colour, self.colour)
-        '''
-        if self.pos.get_p() > (WIDTH, HEIGHT): #Right
-            self.pos.subtract(Vector(500, 0))
-            canvas.draw_circle((0,HEIGHT-self.radius), self.radius, 1, self.colour, self.colour)
 
-        elif self.pos.get_p() < (-1,-1): #Left
-            self.pos.add(Vector(500,0))
-            canvas.draw_circle((0,HEIGHT-self.radius), self.radius, 1, self.colour, self.colour)
-        '''
 
     def update(self):
         self.pos.add(self.vel)
@@ -119,9 +105,6 @@ class KBInteraction:
         Player.update()
         Player.draw(canvas)
 
-
-
-
 class Wall:
     def __init__(self, border, color):
         self.border = border
@@ -143,6 +126,9 @@ class Wall:
             h = (balls.offset_l() >= self.edge_r - 50)
             return h
 
+
+
+
 class Ball:
     def __init__(self,pos, vel, radius, color):
         self.pos = pos
@@ -153,7 +139,6 @@ class Ball:
 
     def offset_l(self):
         return self.pos.x - self.radius
-
 
     def draw(self,canvas):
         canvas.draw_circle(self.pos.get_p(),
@@ -176,13 +161,13 @@ def RandPosY():
     return random.randrange(0, CANVAS_HEIGHT)
 
 
+
 class Interaction:
-    def __init__(self, balls, keyboard, player):
+    def __init__(self, balls, walls, keyboard, player):
         self.balls = balls
-        #self.walls = walls
+        self.walls = walls
         self.keyboard = Keyboard
         self.player = player
-
 
         self.in_collision = set()
 
@@ -212,6 +197,7 @@ class Interaction:
             self.in_collision.discard((b1, b2))
             self.in_collision.discard((b2, b1))
 
+
     def update(self):
     #    for ball in self.balls:
     #        ball.update()
@@ -224,21 +210,6 @@ class Interaction:
 #            self.in_collision = False
 #            self.ball.update()
 
-
-        if self.keyboard.left:
-            self.player.vel.add(Vector(-1, 0))
-
-        elif self.keyboard.right:
-            self.player.vel.add(Vector(1, 0))
-
-        elif self.keyboard.up:
-            self.player.vel.add(Vector(0, -1))
-
-        elif self.keyboard.down:
-            self.player.vel.add(Vector(0, 1))
-
-
-
         for ball1 in self.balls:
             for ball2 in self.balls:
                 if ball1 != ball2:
@@ -246,15 +217,15 @@ class Interaction:
 
     def draw(self, canvas):
 
+        self.update()
         inter.update()
         Player.update()
         Player.draw(canvas)
 
 
-        #self.update()
         for ball in self.balls:
             ball.draw(canvas)
-#            self.walls.draw(canvas)
+            self.walls.draw(canvas)
 
 
 balls = []
@@ -265,7 +236,7 @@ for obj in balls:
 def timer_handler():
     pass
 
-num_balls = 100
+num_balls = 20
 for i in range(num_balls):
 #   def timer_handler():
         balls.append(Ball(Vector(RandPosX(), RandPosY()),Vector(vel_x(), vel_y()), radius_random(), randCol ()))
@@ -278,23 +249,20 @@ print(timer.is_running())
 timer.stop()
 print(timer.is_running())
 
+w = Wall(5, 'red')
+b = balls
 
 kbd = Keyboard()
 #Player = Player(Vector(CANVAS_WIDTH/2, CANVAS_HEIGHT-40), 40)
-Player = Player(Vector(0,0), 40)
+Player = Player(Vector(CANVAS_WIDTH/2,CANVAS_HEIGHT/2), 40)
 inter = KBInteraction(Player, kbd)
 
 
-w = Wall(5, 'red')
-b = Ball((Vector(300,0)), (Vector(1,1)), 20, 'blue')
-b = balls
-
-interaction = Interaction(b, kbd, Player)
+interaction = Interaction(b, w, kbd, Player)
 
 # Create a frame and assign the callback to the event handler
-frame = simplegui.create_frame(" Colours ", CANVAS_WIDTH , CANVAS_HEIGHT)
-frame.set_draw_handler(interaction.draw)
-#frame.set_draw_handler(w.draw)
+frame = simplegui.create_frame(" Group 12 python game project ", CANVAS_WIDTH , CANVAS_HEIGHT)
+frame.set_draw_handler(interaction.draw) #only 1 draw handler
 frame.set_keydown_handler(kbd.keyDown)
 frame.set_keyup_handler(kbd.keyUp)
 
