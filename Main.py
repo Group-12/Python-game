@@ -109,9 +109,14 @@ class Wall:
     def __init__(self, border, color):
         self.border = border
         self.color = color
+
+#####
+#different normals for different walls
+
         self.normal = Vector(1,0)
 
         self.x = CANVAS_WIDTH
+        self.y = CANVAS_HEIGHT
 
         self.edge_r = self.x + self.border
 
@@ -120,6 +125,29 @@ class Wall:
                          (self.x, CANVAS_HEIGHT),
                          self.border*2+1,
                          self.color)
+
+        canvas.draw_line((0, 0),
+                         (0, CANVAS_HEIGHT),
+                         self.border*2+1,
+                         self.color)
+
+        canvas.draw_line((0, 0),
+                         (CANVAS_WIDTH, 0),
+                         self.border*2+1,
+                         self.color)
+
+        canvas.draw_line((0, CANVAS_HEIGHT),
+                         (CANVAS_WIDTH, CANVAS_HEIGHT),
+                         self.border*2+1,
+                         self.color)
+
+# canvas.draw_line(point_one, point_two, line_width, line_color)
+
+
+######
+#create multiple hit functions based on which walls
+
+
 
     def hit(self, ball):
         #    h = (self.ball.offset_l() <= self.edge_r)
@@ -238,7 +266,7 @@ balls = []
 def timer_handler():
     pass
 
-num_balls = 20
+num_balls = 100
 for i in range(num_balls):
 #   def timer_handler():
         balls.append(Ball(Vector(RandPosX(), RandPosY()),Vector(vel_x(), vel_y()), radius_random(), randCol ()))
@@ -251,10 +279,18 @@ print(timer.is_running())
 timer.stop()
 print(timer.is_running())
 
-w = Wall(5, 'red')
+
+
+wl = Wall(5, 'red')
+wr = Wall(5, 'red')
+wt = Wall(5, 'red')
+wb = Wall(5, 'red')
+
+walls=[wl, wr, wt, wb]
+
+
 b = balls
 
-walls=[w]
 
 kbd = Keyboard()
 Player = Player(Vector(CANVAS_WIDTH/2,CANVAS_HEIGHT/2), 40)
