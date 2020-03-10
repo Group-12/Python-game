@@ -171,7 +171,7 @@ class Wall:
 #####
 
 class Ball:
-    def __init__(self,pos, vel, radius, color):
+    def __init__(self, pos, vel, radius, color):
         self.pos = pos
         self.vel = vel
         self.radius =radius
@@ -221,27 +221,40 @@ class Interaction:
         distance = b1.pos.copy().subtract(b2.pos).length()
         return distance <= b1.radius + b2.radius
 
-    # def do_bounce(self, b1, b2):
-    #     normal = b1.pos.copy().subtract(b2.pos).normalize()
-    #
-    #     b1_perp = b1.vel.get_proj(normal)
-    #     b2_perp = b2.vel.get_proj(normal)
-    #     b1_par = b1.vel.copy().subtract(b1_perp)
-    #     b2_par = b2.vel.copy().subtract(b2_perp)
-    #
-    #     b1.vel = b1_par + b2_perp
-    #     b2.vel = b2_par + b1_perp
+    def do_bounce(self, b1, b2):
+        normal = b1.pos.copy().subtract(b2.pos).normalize()
+
+        b1_perp = b1.vel.get_proj(normal)
+        b2_perp = b2.vel.get_proj(normal)
+        b1_par = b1.vel.copy().subtract(b1_perp)
+        b2_par = b2.vel.copy().subtract(b2_perp)
+
+        b1.vel = b1_par + b2_perp
+        b2.vel = b2_par + b1_perp
 
     def collide(self, b1, b2):
         if self.hit(b1, b2):
             b1vb2 = (b1, b2) in self.in_collision
             b2vb1 = (b2, b1) in self.in_collision
             if not b1vb2 and not b2vb1:
-                #self.do_bounce(b1, b2)
+                self.do_bounce(b1, b2)
                 self.in_collision.add((b1, b2))
             else:
                self.in_collision.discard((b1, b2))
                self.in_collision.discard((b2, b1))
+
+    def absorb(self, b1, b2):
+        if self.hit(b1, b2):
+            absorb_1v2 = (b1, b2) in self.in_collision
+            absorb_2v1 = (b2, b1) in self.in_collision
+            if absorb_1v2 == absorb_2v1:
+                if b1.radius < b2.radius:
+                    balls.remove(b1)
+                    b2.radius = b2.radius + b1.radius
+                    print("absorbed")
+                if b1.radius > b2.radius:
+                    balls.remove(b2)
+                    print("absorbed")
 
 
     def update(self):
@@ -250,17 +263,17 @@ class Interaction:
                 if w.hitRight(i) or w.hitLeft(i) or w.hitTop(i) or w.hitBottom(i):
                     if not self.in_collision:
                         i.bounce(w)
-
                         w.in_collision = True
                 else:
                     w.in_collision = False
                     i.update()
+                    #self.update()
 
 
         for ball1 in self.balls:
             for ball2 in self.balls:
                 if ball1 != ball2:
-                    self.collide(ball1, ball2)
+                    self.absorb(ball1, ball2)
 
     def draw(self, canvas):
 
