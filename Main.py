@@ -9,8 +9,8 @@ from Vector import Vector
 
 import random
 
-CANVAS_WIDTH = 500
-CANVAS_HEIGHT = 500
+CANVAS_WIDTH = 700
+CANVAS_HEIGHT = 700
 interval = 100
 
 #####
@@ -30,7 +30,7 @@ def randCol ():
 
 
 def radius_random():
-    return random.randint(3,20)
+    return random.randint(10,15)
 
 def vel_x():
     return random.randint(-2,2)
@@ -250,11 +250,12 @@ class Interaction:
             if absorb_1v2 == absorb_2v1:
                 if b1.radius < b2.radius:
                     balls.remove(b1)
-                    b2.radius = b2.radius + b1.radius
-                    print("absorbed")
+                    b2.radius = b2.radius + b1.radius/2
+                    print("absorbed 1")
                 if b1.radius > b2.radius:
                     balls.remove(b2)
-                    print("absorbed")
+                    b2.radius = b2.radius + b1.radius/2
+                    print("absorbed 2")
 
 
     def update(self):
@@ -275,6 +276,10 @@ class Interaction:
                 if ball1 != ball2:
                     self.absorb(ball1, ball2)
 
+        for ball1 in self.balls:
+            if ball1.radius < self.player.radius:
+                self.absorb(ball1, self.player)
+
     def draw(self, canvas):
 
         self.update()
@@ -290,7 +295,7 @@ class Interaction:
 ######
 
 balls = []
-num_balls = 50
+num_balls = 20
 for i in range(num_balls):
 #   def timer_handler():
         balls.append(Ball(Vector(RandPosX(), RandPosY()),Vector(vel_x(), vel_y()), radius_random(), randCol ()))
@@ -315,7 +320,7 @@ wb = Wall(5, 'red')
 walls=[wl, wr, wt, wb]
 
 kbd = Keyboard()
-Player = Player(Vector(CANVAS_WIDTH/2,CANVAS_HEIGHT/2), 40)
+Player = Player(Vector(CANVAS_WIDTH/2,CANVAS_HEIGHT/2), 5)
 
 inter = KBInteraction(Player, kbd)
 interaction = Interaction(balls, walls, kbd, Player)
