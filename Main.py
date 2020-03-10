@@ -9,8 +9,8 @@ from Vector import Vector
 
 import random
 
-CANVAS_WIDTH = 700
-CANVAS_HEIGHT = 700
+CANVAS_WIDTH = 800
+CANVAS_HEIGHT = 500
 interval = 100
 
 #####
@@ -28,20 +28,27 @@ def randCol ():
 
         return 'rgb('+str(r)+ ','+str(g)+ ','+str(b)+ ')'
 
-
+""" Returns random radius between a range of two numbers"""
 def radius_random():
     return random.randint(10,15)
 
+""" Returns Random velocity for X-axis between set range """
 def vel_x():
     return random.randint(-2,2)
 
+""" Returns Random velocity for Y-axis between set range """
 def vel_y():
     return random.randint(-2,2)
 
 ######
 
 class Player:
-    def __init__(self, pos, radius=10):
+    """
+    Creates a object for the user to control, Player
+    params: Position and Player size
+    Returns: None
+    """
+    def __init__(self, pos, radius):
         self.pos = pos
         self.vel = Vector()
         self.radius = max(radius, 10)
@@ -51,10 +58,11 @@ class Player:
         #print(self.pos.get_p())
         canvas.draw_circle(self.pos.get_p(), self.radius, 1, self.colour, self.colour)
 
-
     def update(self):
         self.pos.add(self.vel)
         self.vel.multiply(0.85)
+
+#######
 
 class Keyboard:
     def __init__(self):
@@ -251,12 +259,20 @@ class Interaction:
                 if b1.radius < b2.radius:
                     balls.remove(b1)
                     b2.radius = b2.radius + b1.radius/2
-                    print("absorbed 1")
-                if b1.radius > b2.radius:
-                    balls.remove(b2)
-                    b2.radius = b2.radius + b1.radius/2
-                    print("absorbed 2")
+                    print("absorbed b1")
+                if b1.radius >= b2.radius:
+                    if b2 in self.balls:
+                        balls.remove(b2)
+                        b2.radius = b2.radius + b1.radius/2
+                        print("absorbed b2")
+                    else:
+                        print("GAME OVER")
+                        ### LIFE COUNTER AND STATMENT HERE ###
+                        # three lifes, update GUI/HUD
 
+                        ### DEATH ANIMATION HERE ###
+                        # set player color to red?
+                        exit()
 
     def update(self):
         for w in self.walls:
@@ -265,11 +281,10 @@ class Interaction:
                     if not self.in_collision:
                         i.bounce(w)
                         w.in_collision = True
-                else:
-                    w.in_collision = False
-                    i.update()
+                    else:
+                        w.in_collision = False
+                        i.update()
                     #self.update()
-
 
         for ball1 in self.balls:
             for ball2 in self.balls:
@@ -279,6 +294,9 @@ class Interaction:
         for ball1 in self.balls:
             if ball1.radius < self.player.radius:
                 self.absorb(ball1, self.player)
+            if ball1.radius > self.player.radius:
+                self.absorb(ball1, self.player)
+                #print("You were absorbed! GAME OVER")
 
     def draw(self, canvas):
 
@@ -320,7 +338,7 @@ wb = Wall(5, 'red')
 walls=[wl, wr, wt, wb]
 
 kbd = Keyboard()
-Player = Player(Vector(CANVAS_WIDTH/2,CANVAS_HEIGHT/2), 5)
+Player = Player(Vector(CANVAS_WIDTH/2,CANVAS_HEIGHT/2), 12.5)
 
 inter = KBInteraction(Player, kbd)
 interaction = Interaction(balls, walls, kbd, Player)
