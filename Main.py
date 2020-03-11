@@ -9,6 +9,9 @@ from Vector import Vector
 
 import random
 
+img = simplegui.load_image("slime.png")
+
+
 CANVAS_WIDTH = 800
 CANVAS_HEIGHT = 500
 interval = 100
@@ -126,7 +129,9 @@ class KBInteraction:
 #####
 
 class Wall:
-    def __init__(self, border, color):
+    def __init__(self, point1, point2, border, color):
+        self.point1 = point1
+        self.point2 = point2
         self.border = border
         self.color = color
 
@@ -136,6 +141,13 @@ class Wall:
         self.edge = self.x + self.border
 
     def draw(self, canvas):
+
+        canvas.draw_line(self.point1,
+                         self.point2,
+                         self.border*2+1,
+                         self.color)
+
+        '''
         canvas.draw_line((self.x, 0),
                          (self.x, CANVAS_HEIGHT),
                          self.border*2+1,
@@ -155,25 +167,25 @@ class Wall:
                          (CANVAS_WIDTH, CANVAS_HEIGHT),
                          self.border*2+1,
                          self.color)
-
+        '''
     def hitRight(self, ball):
         self.normal = Vector(1,0)
-        h1 = (ball.offset_x() >= self.edge - 50)
+        h1 = (ball.offset_l() >= self.edge - 50)
         return h1
 
     def hitLeft(self, ball):
         self.normal = Vector(-1,0)
-        h2 = (ball.offset_x() <= self.edge)
+        h2 = (ball.offset_r() <= self.edge)
         return h2
 
     def hitTop(self, ball):
         self.normal = Vector(0,1)
-        h3 = (ball.offset_y() >= self.edge - 50)
+        h3 = (ball.offset_t() >= self.edge + 50)
         return h3
 
     def hitBottom(self, ball):
         self.normal = Vector(0,-1)
-        h4 = (ball.offset_y() <= self.edge)
+        h4 = (ball.offset_b() <= self.edge)
         return h4
 
 #####
@@ -186,11 +198,26 @@ class Ball:
         self.color = color
         self.border = 1
 
-    def offset_x(self):
+        #width = 512
+        #height = 192
+        #columns = 3
+        #rows = 8
+#https://py3.codeskulptor.org/#user305_OeE5CQwr4D_2.py
+
+
+
+    def offset_l(self):
         return self.pos.x - self.radius
 
-    def offset_y(self):
+    def offset_r(self):
+        return self.pos.x + self.radius
+
+    def offset_t(self):
         return self.pos.y - self.radius
+
+    def offset_b(self):
+        return self.pos.y + self.radius
+
 
     def draw(self,canvas):
         canvas.draw_circle(self.pos.get_p(),
@@ -278,6 +305,7 @@ class Interaction:
         for w in self.walls:
             for i in self.balls:
                 if w.hitRight(i) or w.hitLeft(i) or w.hitTop(i) or w.hitBottom(i):
+                    print("COLLISION")
                     if not self.in_collision:
                         i.bounce(w)
                         w.in_collision = True
@@ -310,6 +338,8 @@ class Interaction:
         for w in self.walls:
             w.draw(canvas)
 
+
+
 ######
 
 balls = []
@@ -319,22 +349,24 @@ for i in range(num_balls):
         balls.append(Ball(Vector(RandPosX(), RandPosY()),Vector(vel_x(), vel_y()), radius_random(), randCol ()))
 
 ######
-
+'''
 def timer_handler():
     pass
 timer = simplegui.create_timer(100, timer_handler)
-print(timer.is_running())
-timer.start()
-print(timer.is_running())
-timer.stop()
-print(timer.is_running())
 
+motes = 0
+timer.start()
+
+else:
+    timer.stop()
+'''
 ######
 
-wl = Wall(5, 'red')
-wr = Wall(5, 'red')
-wt = Wall(5, 'red')
-wb = Wall(5, 'red')
+wl = Wall((CANVAS_WIDTH, 0), (CANVAS_WIDTH, CANVAS_HEIGHT), 5, 'red')
+wr = Wall((0, 0),(0, CANVAS_HEIGHT), 5, 'red')
+wt = Wall((0, 0),(CANVAS_WIDTH, 0),5, 'red')
+wb = Wall((0, CANVAS_HEIGHT), (CANVAS_WIDTH, CANVAS_HEIGHT), 5, 'red')
+
 walls=[wl, wr, wt, wb]
 
 kbd = Keyboard()
