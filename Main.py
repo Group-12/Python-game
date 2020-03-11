@@ -47,7 +47,7 @@ def vel_y():
 
 class Player:
     """
-    Creates a object for the user to control, Player
+    Creates a object for the user to control
     params: Position and Player size
     Returns: None
     """
@@ -68,6 +68,11 @@ class Player:
 #######
 
 class Keyboard:
+    """
+    Detects button plresses
+    params: None
+    Returns: None
+    """
     def __init__(self):
         self.left = False
         self.right = False
@@ -103,6 +108,11 @@ class Keyboard:
 #####
 
 class KBInteraction:
+    """
+    Creates the interaction between the keyboard and the player
+    params: Player and Keyboard classes
+    Returns: None
+    """
     def __init__(self, player, keyboard):
         self.player = player
         self.keyboard = keyboard
@@ -129,6 +139,13 @@ class KBInteraction:
 #####
 
 class Wall:
+    """
+    Creates the walls and detects if a hit has happened
+    params: start and end points of each line,
+            width of each border and color.
+    Returns: None
+    """
+
     def __init__(self, point1, point2, border, color):
         self.point1 = point1
         self.point2 = point2
@@ -138,6 +155,7 @@ class Wall:
         # (x, y) is midpoint of the wall
         self.x = (self.point1[0] + self.point2[0])/2
         self.y = (self.point1[1] + self.point2[1])/2
+
         self.minx = min(self.point1[0],self.point2[0])
         self.miny = min(self.point1[1],self.point2[1])
 
@@ -145,53 +163,33 @@ class Wall:
         self.maxy = max(self.point1[1],self.point2[1])
 
         self.edge = self.x + self.border
-        #self.edgeX = self.x
-        #self.edgeY = self.y
 
     def draw(self, canvas):
-
         canvas.draw_line(self.point1,
                          self.point2,
                          self.border*2+1,
                          self.color)
 
-        '''
-        canvas.draw_line((self.x, 0),
-                         (self.x, CANVAS_HEIGHT),
-                         self.border*2+1,
-                         self.color)
-
-        canvas.draw_line((0, 0),
-                         (0, CANVAS_HEIGHT),
-                         self.border*2+1,
-                         self.color)
-
-        canvas.draw_line((0, 0),
-                         (CANVAS_WIDTH, 0),
-                         self.border*2+1,
-                         self.color)
-
-        canvas.draw_line((0, CANVAS_HEIGHT),
-                         (CANVAS_WIDTH, CANVAS_HEIGHT),
-                         self.border*2+1,
-                         self.color)
-        '''
     def hitTest(self, ball):
+            #left hit
         if self.x < CANVAS_WIDTH/2:
             self.normal = Vector(1,0)
             isHit = (ball.offset_l() <= self.x + self.border/2)
-        #print("fixme hit left")
+            #print("fixme hit left")
 
+            #right hit
         elif self.x > CANVAS_WIDTH/2:
             self.normal = Vector(1,0)
             isHit = (ball.offset_r() >= self.x - self.border/2)
             #print("fixme hit right")
 
+            #top hit
         elif self.y < CANVAS_HEIGHT/2:
             self.normal = Vector(0,1)
             isHit = (ball.offset_t() <= self.y + self.border/2)
             #print("fixme hit top")
 
+            #bottom hit
         elif self.y > CANVAS_HEIGHT/2:
             self.normal = Vector(0,-1)
             isHit = (ball.offset_b() >= self.y - self.border/2)
@@ -199,7 +197,7 @@ class Wall:
             #print("fixme hit bottom")
 
         else:
-            print("no such wall")
+            print("ERROR: No such wall!")
 
         #print("fixme = {}".format(isHit))
         return isHit
@@ -207,6 +205,11 @@ class Wall:
 #####
 
 class Ball:
+    """
+    Creates each ball
+    params: Position, velocity, ball size and color
+    Returns: None
+    """
     def __init__(self, pos, vel, radius, color):
         self.pos = pos
         self.vel = vel
@@ -222,16 +225,16 @@ class Ball:
 
 
 
-    def offset_l(self):
+    def offset_l(self): # left
         return self.pos.x - self.radius
 
-    def offset_r(self):
+    def offset_r(self): # right
         return self.pos.x + self.radius
 
-    def offset_t(self):
+    def offset_t(self): # top
         return self.pos.y - self.radius
 
-    def offset_b(self):
+    def offset_b(self): # bottom
         return self.pos.y + self.radius
 
 
@@ -244,14 +247,13 @@ class Ball:
         self.update()
 
     def update(self):
-        #self.pos=self.pos.add(self.vel)
         self.pos.add(self.vel)
 
     def bounce(self, wall):
         self.vel.reflect(wall.normal)
 
-
-
+#rad is the radius of the ball. using rad stops
+#balls from spawning on the border, causing them to stick
 def RandPosX(rad):
     return random.randrange(rad, CANVAS_WIDTH - rad)
 def RandPosY(rad):
@@ -260,7 +262,13 @@ def RandPosY(rad):
 ######
 
 class Interaction:
-    def __init__(self, ball, walls, keyboard, player):
+    """
+    Controls all interations between the other classes
+    params: list of balls, list of walls,
+            keyboard and player
+    Returns: None
+    """
+    def __init__(self, balls, walls, keyboard, player):
         self.balls = balls
         self.walls = walls
         self.keyboard = Keyboard
@@ -268,10 +276,12 @@ class Interaction:
 
         self.in_collision = set()
 
+        #hit between two balls or a ball and a player
     def hit(self, b1, b2):
         distance = b1.pos.copy().subtract(b2.pos).length()
         return distance <= b1.radius + b2.radius
 
+        #creates a bounce between two balls
     def do_bounce(self, b1, b2):
         normal = b1.pos.copy().subtract(b2.pos).normalize()
 
@@ -283,6 +293,7 @@ class Interaction:
         b1.vel = b1_par + b2_perp
         b2.vel = b2_par + b1_perp
 
+    #detects if two balls have collided
     def collide(self, b1, b2):
         if self.hit(b1, b2):
             b1vb2 = (b1, b2) in self.in_collision
@@ -294,6 +305,7 @@ class Interaction:
                self.in_collision.discard((b1, b2))
                self.in_collision.discard((b2, b1))
 
+    #determines if a ball should be absorbed
     def absorb(self, b1, b2):
         if self.hit(b1, b2):
             absorb_1v2 = (b1, b2) in self.in_collision
@@ -302,14 +314,13 @@ class Interaction:
                 if b1.radius < b2.radius:
                     balls.remove(b1)
                     b2.radius = b2.radius + b1.radius/2
-                    print("absorbed b1")
                 if b1.radius >= b2.radius:
                     if b2 in self.balls:
                         balls.remove(b2)
                         b2.radius = b2.radius + b1.radius/2
-                        print("absorbed b2")
                     else:
-                        print("GAME OVER")
+                        print("You were absorbed! GAME OVER")
+                        
                         ### LIFE COUNTER AND STATMENT HERE ###
                         # three lifes, update GUI/HUD
 
@@ -320,7 +331,6 @@ class Interaction:
     def update(self):
         for w in self.walls:
             for i in self.balls:
-                #if w.hitRight(i) or w.hitLeft(i) or w.hitTop(i) or w.hitBottom(i):
                 if w.hitTest(i):
                     if not self.in_collision:
                         i.bounce(w)
@@ -328,7 +338,6 @@ class Interaction:
                     else:
                         w.in_collision = False
                         i.update()
-                    #self.update()
 
         for ball1 in self.balls:
             for ball2 in self.balls:
@@ -340,7 +349,6 @@ class Interaction:
                 self.absorb(ball1, self.player)
             if ball1.radius > self.player.radius:
                 self.absorb(ball1, self.player)
-                #print("You were absorbed! GAME OVER")
 
     def draw(self, canvas):
 
@@ -359,7 +367,7 @@ class Interaction:
 ######
 
 balls = []
-num_balls = 20
+num_balls = 30
 for i in range(num_balls):
 #   def timer_handler():
         rad = radius_random()
@@ -389,7 +397,7 @@ walls=[wl, wr, wt, wb]
 kbd = Keyboard()
 Player = Player(Vector(CANVAS_WIDTH/2,CANVAS_HEIGHT/2), 12.5)
 
-inter = KBInteraction(Player, kbd)
+inter = KBInteraction(Player, kbd) #test player without balls getting in the way
 interaction = Interaction(balls, walls, kbd, Player)
 
 # Create a frame and assign the callback to the event handler
