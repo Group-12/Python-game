@@ -252,10 +252,10 @@ class Ball:
 
 
 
-def RandPosX():
-    return random.randrange(0, CANVAS_WIDTH)
-def RandPosY():
-    return random.randrange(0, CANVAS_HEIGHT)
+def RandPosX(rad):
+    return random.randrange(rad, CANVAS_WIDTH - rad)
+def RandPosY(rad):
+    return random.randrange(rad, CANVAS_HEIGHT - rad)
 
 ######
 
@@ -362,7 +362,8 @@ balls = []
 num_balls = 20
 for i in range(num_balls):
 #   def timer_handler():
-        balls.append(Ball(Vector(RandPosX(), RandPosY()),Vector(vel_x(), vel_y()), radius_random(), randCol ()))
+        rad = radius_random()
+        balls.append(Ball(Vector(RandPosX(rad), RandPosY(rad)),Vector(vel_x(), vel_y()), rad, randCol ()))
 
 ######
 '''
