@@ -135,10 +135,18 @@ class Wall:
         self.border = border
         self.color = color
 
-        self.x = CANVAS_WIDTH
-        self.y = CANVAS_HEIGHT
+        # (x, y) is midpoint of the wall
+        self.x = (self.point1[0] + self.point2[0])/2
+        self.y = (self.point1[1] + self.point2[1])/2
+        self.minx = min(self.point1[0],self.point2[0])
+        self.miny = min(self.point1[1],self.point2[1])
+
+        self.maxx = max(self.point1[0],self.point2[0])
+        self.maxy = max(self.point1[1],self.point2[1])
 
         self.edge = self.x + self.border
+        #self.edgeX = self.x
+        #self.edgeY = self.y
 
     def draw(self, canvas):
 
@@ -168,25 +176,33 @@ class Wall:
                          self.border*2+1,
                          self.color)
         '''
-    def hitRight(self, ball):
-        self.normal = Vector(1,0)
-        h1 = (ball.offset_l() >= self.edge - 50)
-        return h1
+    def hitTest(self, ball):
+        if self.x < CANVAS_WIDTH/2:
+            self.normal = Vector(1,0)
+            isHit = (ball.offset_l() <= self.x + self.border/2)
+        #print("fixme hit left")
 
-    def hitLeft(self, ball):
-        self.normal = Vector(-1,0)
-        h2 = (ball.offset_r() <= self.edge)
-        return h2
+        elif self.x > CANVAS_WIDTH/2:
+            self.normal = Vector(1,0)
+            isHit = (ball.offset_r() >= self.x - self.border/2)
+            #print("fixme hit right")
 
-    def hitTop(self, ball):
-        self.normal = Vector(0,1)
-        h3 = (ball.offset_t() >= self.edge + 50)
-        return h3
+        elif self.y < CANVAS_HEIGHT/2:
+            self.normal = Vector(0,1)
+            isHit = (ball.offset_t() <= self.y + self.border/2)
+            #print("fixme hit top")
 
-    def hitBottom(self, ball):
-        self.normal = Vector(0,-1)
-        h4 = (ball.offset_b() <= self.edge)
-        return h4
+        elif self.y > CANVAS_HEIGHT/2:
+            self.normal = Vector(0,-1)
+            isHit = (ball.offset_b() >= self.y - self.border/2)
+            #print("fixme y = {}".format(self.y))
+            #print("fixme hit bottom")
+
+        else:
+            print("no such wall")
+
+        #print("fixme = {}".format(isHit))
+        return isHit
 
 #####
 
@@ -304,8 +320,8 @@ class Interaction:
     def update(self):
         for w in self.walls:
             for i in self.balls:
-                if w.hitRight(i) or w.hitLeft(i) or w.hitTop(i) or w.hitBottom(i):
-                    print("COLLISION")
+                #if w.hitRight(i) or w.hitLeft(i) or w.hitTop(i) or w.hitBottom(i):
+                if w.hitTest(i):
                     if not self.in_collision:
                         i.bounce(w)
                         w.in_collision = True
