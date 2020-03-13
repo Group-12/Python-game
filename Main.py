@@ -240,14 +240,14 @@ class Ball:
         return self.pos.y + self.radius
 
     def update_index():
-        frame_index = [2,1]
-        #global frame_index
+        #frame_index = [2,1]
+        global frame_index
         frame_index[0] = (frame_index[0] + 1) % columns
         if frame_index[0] == 0:
             frame_index[1] = (frame_index[1] + 1) % rows
 
     def draw(self, canvas):
-        update_index()
+        Ball.update_index()
 
         source_centre = (frame_width * frame_index[0] + frame_centre_x,
         frame_height * frame_index[1] + frame_centre_y)
