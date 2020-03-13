@@ -91,6 +91,12 @@ class Keyboard:
 
         elif key == simplegui.KEY_MAP['down']:
             self.down = True
+                  
+        elif key == simplegui.KEY_MAP["p"] and pause == False:
+                pause = True
+
+        elif key == simplegui.KEY_MAP["p"] and pause == True:
+                pause = False
 
     def keyUp(self, key):
         if key == simplegui.KEY_MAP['left']:
@@ -352,15 +358,19 @@ class Interaction:
 
     def draw(self, canvas):
 
-        self.update()
-        inter.update()
-        Player.update()
-        Player.draw(canvas)
+        if not pause:
+            self.update()
+            inter.update()
+            Player.update()
+            Player.draw(canvas)
 
-        for ball in self.balls:
-            ball.draw(canvas)
-        for w in self.walls:
-            w.draw(canvas)
+            for ball in self.balls:
+                ball.draw(canvas)
+            for w in self.walls:
+                w.draw(canvas)
+         
+         else:
+             canvas.draw_text("Press 'p' to unpause", [CANVAS_WIDTH / 2 - 100, CANVAS_HEIGHT / 2 - 200], 28, "White")
 
 
 
