@@ -10,7 +10,17 @@ from Vector import Vector
 import random
 
 img = simplegui.load_image("slime.png")
+width = 512
+height = 192
+columns = 8
+rows = 3
+#https://py3.codeskulptor.org/#user305_OeE5CQwr4D_2.py
+frame_width = width / columns
+frame_height = height / rows
+frame_centre_x = frame_width / 2
+frame_centre_y = frame_height / 2
 
+frame_index = [2,1]
 
 CANVAS_WIDTH = 800
 CANVAS_HEIGHT = 500
@@ -217,14 +227,6 @@ class Ball:
         self.color = color
         self.border = 1
 
-        #width = 512
-        #height = 192
-        #columns = 3
-        #rows = 8
-#https://py3.codeskulptor.org/#user305_OeE5CQwr4D_2.py
-
-
-
     def offset_l(self): # left
         return self.pos.x - self.radius
 
@@ -237,13 +239,31 @@ class Ball:
     def offset_b(self): # bottom
         return self.pos.y + self.radius
 
+    def update_index():
+        frame_index = [2,1]
+        #global frame_index
+        frame_index[0] = (frame_index[0] + 1) % columns
+        if frame_index[0] == 0:
+            frame_index[1] = (frame_index[1] + 1) % rows
 
-    def draw(self,canvas):
+    def draw(self, canvas):
+        update_index()
+
+        source_centre = (frame_width * frame_index[0] + frame_centre_x,
+        frame_height * frame_index[1] + frame_centre_y)
+        source_size = (frame_width, frame_height)
+        dest_centre = (300, 150)
+        # doesn't have to be same aspect ration as frame!
+        dest_size = (100, 100)
+        canvas.draw_image(img, source_centre, source_size, dest_centre, dest_size)
+
+        '''
         canvas.draw_circle(self.pos.get_p(),
                            self.radius,
                            self.border,
                            self.color,
                            self.color)
+        '''
         self.update()
 
     def update(self):
@@ -320,7 +340,7 @@ class Interaction:
                         b2.radius = b2.radius + b1.radius/2
                     else:
                         print("You were absorbed! GAME OVER")
-                        
+
                         ### LIFE COUNTER AND STATMENT HERE ###
                         # three lifes, update GUI/HUD
 
@@ -395,7 +415,12 @@ wb = Wall((0, CANVAS_HEIGHT), (CANVAS_WIDTH, CANVAS_HEIGHT), 5, 'red')
 walls=[wl, wr, wt, wb]
 
 kbd = Keyboard()
+
+TotalPlayers =1 #fixme
 Player = Player(Vector(CANVAS_WIDTH/2,CANVAS_HEIGHT/2), 12.5)
+if TotalPlayers == 2:
+    Player2 = Player(Vector(CANVAS_WIDTH/3,CANVAS_HEIGHT/3), 12.5)
+
 
 inter = KBInteraction(Player, kbd) #test player without balls getting in the way
 interaction = Interaction(balls, walls, kbd, Player)
