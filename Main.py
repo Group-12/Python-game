@@ -7,7 +7,19 @@
 import simplegui
 from user304_rsf8mD0BOQ_1 import Vector
 
+from math import pi
 import random
+
+message = "GROUP 12 PYTHON GAME"
+guide_text1 = ""
+guide_text2 = ""
+guide_text3 = ""
+guide_text4 = ""
+guide_text5 = ""
+guide_text6 = ""
+guide_text7 = ""
+currentArea = ""
+currentLives = ""
 
 img = simplegui.load_image("slime.png")
 
@@ -418,6 +430,8 @@ class Interaction:
 
 
     def draw(self, canvas):
+        currentArea = str(self.player.radius)
+        canvas.draw_text('Current Area: ' + currentArea, [10,480], 24, "White")
 
         if not pause:
             self.update()
@@ -448,7 +462,7 @@ for i in range(num_powerups):
         print("fixme")
 
 balls = []
-num_balls = 0
+num_balls = 15
 for i in range(num_balls):
 #   def timer_handler():
         rad = radius_random()
@@ -481,10 +495,71 @@ Player = Player(Vector(CANVAS_WIDTH/2,CANVAS_HEIGHT/2), 12.5)
 inter = KBInteraction(Player, kbd) #test player without balls getting in the way
 interaction = Interaction(balls, walls, kbd, Player, powerUps)
 
+def play():
+    global message, guide_text1, guide_text2, guide_text3, guide_text4, guide_text5, guide_text6, guide_text7, currentArea, currentLives
+    message = ""
+    lives = 3
+    radius = 5
+    currentSize = round((pi * radius ** 2), 1)
+    currentArea = "Current Size : " + str(currentSize)
+    currentLives = "Lives : " + str(lives)
+    guide_text1 = ""
+    guide_text2 = ""
+    guide_text3 = ""
+    guide_text4 = ""
+    guide_text5 = ""
+    guide_text6 = ""
+    guide_text7 = ""
+    frame.set_draw_handler(interaction.draw)
+
+def guide():
+    global message, guide_text1, guide_text2, guide_text3, guide_text4, guide_text5, guide_text6, guide_text7, currentArea, currentLives
+    message = ""
+    currentArea = ""
+    currentLives = ""
+    guide_text1 = "The aim of the game is to grow yourself from a small mote"
+    guide_text2 = "into as large of a mote as possible. This can be done by"
+    guide_text3 = "colliding with smaller motes in order to get bigger. "
+    guide_text4 = "However, colliding with a mote than is larger than your "
+    guide_text5 = "current size will result in your current life to end."
+    guide_text6 = "You will have start with 3 lives, once these lives have"
+    guide_text7 = "been used up, the game will end. Have FUN !"
+
+def exitGame():
+    global message, guide_text1, guide_text2, guide_text3, guide_text4, guide_text5, guide_text6, guide_text7, currentArea, currentLives
+    message = "Thanks for playing!"
+    currentLives = ""
+    currentArea = ""
+    guide_text1 = ""
+    guide_text2 = ""
+    guide_text3 = ""
+    guide_text4 = ""
+    guide_text5 = ""
+    guide_text6 = ""
+    guide_text7 = ""
+    exit()
+
+def draw(canvas):
+    canvas.draw_text(message, [75,250], 54, "White")
+    canvas.draw_text(currentArea, [10,190], 10, "White")
+    canvas.draw_text(currentLives, [250,190], 10, "White")
+    canvas.draw_text(guide_text1, [40,110], 30, "White")
+    canvas.draw_text(guide_text2, [40,140], 30, "White")
+    canvas.draw_text(guide_text3, [40,170], 30, "White")
+    canvas.draw_text(guide_text4, [40,200], 30, "White")
+    canvas.draw_text(guide_text5, [40,230], 30, "White")
+    canvas.draw_text(guide_text6, [40,260], 30, "White")
+    canvas.draw_text(guide_text7, [40,290], 30, "White")
+
 # Create a frame and assign the callback to the event handler
 frame = simplegui.create_frame(" Group 12 python game project ", CANVAS_WIDTH , CANVAS_HEIGHT)
-frame.set_draw_handler(interaction.draw) #only 1 draw handler
+frame.set_canvas_background('Black')
+#frame.set_draw_handler(interaction.draw) #only 1 draw handler
+frame.add_button("Play", play)
+frame.add_button("Guide", guide)
+frame.add_button("Exit", exitGame)
 frame.set_keydown_handler(kbd.keyDown)
 frame.set_keyup_handler(kbd.keyUp)
+frame.set_draw_handler(draw)
 
 frame.start()
