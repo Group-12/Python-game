@@ -15,7 +15,7 @@ img = simplegui.load_image("slime.png")
 CANVAS_WIDTH = 800
 CANVAS_HEIGHT = 500
 interval = 100
-
+pause = False
 #####
 
 """
@@ -80,6 +80,7 @@ class Keyboard:
         self.down = False
 
     def keyDown(self, key):
+        global pause
         if key == simplegui.KEY_MAP['left']:
             self.left = True
 
@@ -91,14 +92,14 @@ class Keyboard:
 
         elif key == simplegui.KEY_MAP['down']:
             self.down = True
-                  
-        elif key == simplegui.KEY_MAP["p"] and pause == False:
+
+        elif key == simplegui.KEY_MAP['p'] and pause == False:
                 pause = True
 
-        elif key == simplegui.KEY_MAP["p"] and pause == True:
-                pause = False
+
 
     def keyUp(self, key):
+        global pause
         if key == simplegui.KEY_MAP['left']:
             self.left = False
 
@@ -110,6 +111,9 @@ class Keyboard:
 
         elif key == simplegui.KEY_MAP['down']:
             self.down = False
+
+        elif key == simplegui.KEY_MAP['p'] and pause == True:
+                pause = False
 
 #####
 
@@ -326,7 +330,7 @@ class Interaction:
                         b2.radius = b2.radius + b1.radius/2
                     else:
                         print("You were absorbed! GAME OVER")
-                        
+
                         ### LIFE COUNTER AND STATMENT HERE ###
                         # three lifes, update GUI/HUD
 
@@ -368,9 +372,10 @@ class Interaction:
                 ball.draw(canvas)
             for w in self.walls:
                 w.draw(canvas)
-         
-         else:
-             canvas.draw_text("Press 'p' to unpause", [CANVAS_WIDTH / 2 - 100, CANVAS_HEIGHT / 2 - 200], 28, "White")
+
+
+        else:
+            canvas.draw_text("Press 'p' to unpause", [CANVAS_WIDTH / 2 - 100, CANVAS_HEIGHT / 2 - 200], 28, "White")
 
 
 
