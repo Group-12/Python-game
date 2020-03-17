@@ -1,11 +1,11 @@
 #### RUN ON WINDOWS ###
-#import SimpleGUICS2Pygame.simpleguics2pygame as simplegui
-#from Vector import Vector
+import SimpleGUICS2Pygame.simpleguics2pygame as simplegui
+from Vector import Vector
 #control + BREAK to kill process, control + C does not work
 
 ### RUN ON CODESKULPTOR ###
-import simplegui
-from user304_rsf8mD0BOQ_1 import Vector
+#import simplegui
+#from user304_rsf8mD0BOQ_1 import Vector
 
 from math import pi
 import random
@@ -387,11 +387,14 @@ class Interaction:
                     typePowerUp = random.randint(1, 3)
                     print(typePowerUp)
                     if typePowerUp == 1:
-                        pass
+                        Player.vel = Player.vel * 5
+                        print("Velocity PowerUp!")
                     if typePowerUp == 2:
                         b2.radius = b2.radius * 1.5
+                        print("Radius PowerUp!")
                     if typePowerUp == 3:
                         pass
+                        print("Extra Life! (fixme)")
                     print('here')
 
 
@@ -417,11 +420,15 @@ class Interaction:
             if ball1.radius > self.player.radius:
                 self.absorb(ball1, self.player)
 
-        for ball1 in self.pups:
-            for ball2 in self.pups:
-                if ball1 != ball2:
-                    self.absorb1(ball1, ball2)
 
+        #Detect Player touching PowerUp items
+    #    for ball1 in self.pups:
+    #        for ball2 in self.pups:
+    #            if ball1 != ball2:
+    #                self.absorb1(ball1, ball2)
+
+
+        #Detect Player touching PowerUp items
         for ball1 in self.pups:
             if ball1.radius < self.player.radius:
                 self.absorb1(ball1, self.player)
@@ -445,12 +452,8 @@ class Interaction:
                 w.draw(canvas)
             for p in self.pups:
                 p.draw(canvas)
-
-
         else:
             canvas.draw_text("Press 'p' to unpause", [CANVAS_WIDTH / 2 - 100, CANVAS_HEIGHT / 2 - 200], 28, "White")
-
-
 
 ######
 
@@ -459,7 +462,6 @@ num_powerups = 5
 for i in range(num_powerups):
         rad = 10
         powerUps.append(PowerUps(Vector(RandPosX(rad), RandPosY(rad)),Vector(vel_x(), vel_y()), rad))
-        print("fixme")
 
 balls = []
 num_balls = 15
@@ -494,6 +496,9 @@ Player = Player(Vector(CANVAS_WIDTH/2,CANVAS_HEIGHT/2), 12.5)
 
 inter = KBInteraction(Player, kbd) #test player without balls getting in the way
 interaction = Interaction(balls, walls, kbd, Player, powerUps)
+
+
+######
 
 def play():
     global message, guide_text1, guide_text2, guide_text3, guide_text4, guide_text5, guide_text6, guide_text7, currentArea, currentLives
@@ -550,6 +555,8 @@ def draw(canvas):
     canvas.draw_text(guide_text5, [40,230], 30, "White")
     canvas.draw_text(guide_text6, [40,260], 30, "White")
     canvas.draw_text(guide_text7, [40,290], 30, "White")
+
+#####
 
 # Create a frame and assign the callback to the event handler
 frame = simplegui.create_frame(" Group 12 python game project ", CANVAS_WIDTH , CANVAS_HEIGHT)
