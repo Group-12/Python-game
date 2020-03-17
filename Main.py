@@ -1,11 +1,11 @@
 #### RUN ON WINDOWS ###
-import SimpleGUICS2Pygame.simpleguics2pygame as simplegui
-from Vector import Vector
+#import SimpleGUICS2Pygame.simpleguics2pygame as simplegui
+#from Vector import Vector
 #control + BREAK to kill process, control + C does not work
 
 ### RUN ON CODESKULPTOR ###
-#import simplegui
-#from user304_rsf8mD0BOQ_1 import Vector
+import simplegui
+from user304_rsf8mD0BOQ_1 import Vector
 
 import random
 
@@ -223,7 +223,7 @@ class Ball:
     def __init__(self, pos, vel, radius, color):
         self.pos = pos
         self.vel = vel
-        self.radius =radius
+        self.radius = radius
         self.color = color
         self.border = 1
 
@@ -262,6 +262,27 @@ class Ball:
     def bounce(self, wall):
         self.vel.reflect(wall.normal)
 
+
+
+class PowerUps:
+    def __init__(self, pos, vel, radius):
+        self.pos = pos
+        self.vel = 0
+        self.radius = radius
+        self.color = 'White'
+        self.border = 1
+
+    def draw(self, canvas):
+        canvas.draw_circle(self.pos.get_p(),
+                           self.radius,
+                           self.border,
+                           self.color,
+                           self.color)
+
+    def update(self):
+        self.pos.add(self.vel)
+
+
 #rad is the radius of the ball. using rad stops
 #balls from spawning on the border, causing them to stick
 def RandPosX(rad):
@@ -278,15 +299,20 @@ class Interaction:
             keyboard and player
     Returns: None
     """
-    def __init__(self, balls, walls, keyboard, player):
+    def __init__(self, balls, walls, keyboard, player, pups):
         self.balls = balls
         self.walls = walls
         self.keyboard = Keyboard
         self.player = player
+        self.pups = pups
 
         self.in_collision = set()
 
         #hit between two balls or a ball and a player
+
+    def collisionPup(self):
+        pass
+
     def hit(self, b1, b2):
         distance = b1.pos.copy().subtract(b2.pos).length()
         return distance <= b1.radius + b2.radius
@@ -338,6 +364,25 @@ class Interaction:
                         # set player color to red?
                         exit()
 
+
+    def absorb1(self, b1, b2):
+        if self.hit(b1, b2):
+            absorb_1v2 = (b1, b2) in self.in_collision
+            absorb_2v1 = (b2, b1) in self.in_collision
+            if absorb_1v2 == absorb_2v1:
+                if b1.radius < b2.radius:
+                    powerUps.remove(b1)
+                    typePowerUp = random.randint(1, 3)
+                    print(typePowerUp)
+                    if typePowerUp == 1:
+                        pass
+                    if typePowerUp == 2:
+                        b2.radius = b2.radius * 1.5
+                    if typePowerUp == 3:
+                        pass
+                    print('here')
+
+
     def update(self):
         for w in self.walls:
             for i in self.balls:
@@ -360,6 +405,18 @@ class Interaction:
             if ball1.radius > self.player.radius:
                 self.absorb(ball1, self.player)
 
+        for ball1 in self.pups:
+            for ball2 in self.pups:
+                if ball1 != ball2:
+                    self.absorb1(ball1, ball2)
+
+        for ball1 in self.pups:
+            if ball1.radius < self.player.radius:
+                self.absorb1(ball1, self.player)
+            if ball1.radius > self.player.radius:
+                self.absorb1(ball1, self.player)
+
+
     def draw(self, canvas):
 
         if not pause:
@@ -372,6 +429,8 @@ class Interaction:
                 ball.draw(canvas)
             for w in self.walls:
                 w.draw(canvas)
+            for p in self.pups:
+                p.draw(canvas)
 
 
         else:
@@ -381,8 +440,15 @@ class Interaction:
 
 ######
 
+powerUps = []
+num_powerups = 5
+for i in range(num_powerups):
+        rad = 10
+        powerUps.append(PowerUps(Vector(RandPosX(rad), RandPosY(rad)),Vector(vel_x(), vel_y()), rad))
+        print("fixme")
+
 balls = []
-num_balls = 30
+num_balls = 0
 for i in range(num_balls):
 #   def timer_handler():
         rad = radius_random()
@@ -413,7 +479,7 @@ kbd = Keyboard()
 Player = Player(Vector(CANVAS_WIDTH/2,CANVAS_HEIGHT/2), 12.5)
 
 inter = KBInteraction(Player, kbd) #test player without balls getting in the way
-interaction = Interaction(balls, walls, kbd, Player)
+interaction = Interaction(balls, walls, kbd, Player, powerUps)
 
 # Create a frame and assign the callback to the event handler
 frame = simplegui.create_frame(" Group 12 python game project ", CANVAS_WIDTH , CANVAS_HEIGHT)
