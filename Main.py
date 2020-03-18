@@ -107,6 +107,9 @@ class Keyboard:
 
         elif key == simplegui.KEY_MAP['p'] and pause == False:
                 pause = True
+                
+        elif key == simplegui.KEY_MAP['p'] and pause == True:
+                pause = False
 
 
 
@@ -124,8 +127,6 @@ class Keyboard:
         elif key == simplegui.KEY_MAP['down']:
             self.down = False
 
-        elif key == simplegui.KEY_MAP['p'] and pause == True:
-                pause = False
 
 #####
 
