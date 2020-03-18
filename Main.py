@@ -22,7 +22,7 @@ currentArea = ""
 currentLives = ""
 
 img = simplegui.load_image("slime.png")
-
+arrow = simplegui.load_image("https://library.kissclipart.com/20190405/kxw/kissclipart-arrow-computer-icons-scalable-vector-graphics-port-4c2bf6f18917853c.png")
 
 CANVAS_WIDTH = 800
 CANVAS_HEIGHT = 500
@@ -446,7 +446,15 @@ class Interaction:
             inter.update()
             Player.update()
             Player.draw(canvas)
-
+            if kbd.down == True:
+                canvas.draw_image(arrow, ((arrow.get_width() / 2), (arrow.get_height() / 2)), (arrow.get_width(),arrow.get_height()), (Player.pos.x, Player.pos.y), (20, 20))
+            if kbd.left == True:
+                canvas.draw_image(arrow, ((arrow.get_width() / 2), (arrow.get_height() / 2)), (arrow.get_width(),arrow.get_height()), (Player.pos.x, Player.pos.y), (20, 20), 1.5708)
+            if kbd.up == True:
+                canvas.draw_image(arrow, ((arrow.get_width() / 2), (arrow.get_height() / 2)), (arrow.get_width(),arrow.get_height()), (Player.pos.x, Player.pos.y), (20, 20), 3.14159)
+            if kbd.right == True:
+                canvas.draw_image(arrow, ((arrow.get_width() / 2), (arrow.get_height() / 2)), (arrow.get_width(),arrow.get_height()), (Player.pos.x, Player.pos.y), (20, 20), 4.71239)
+            
             for ball in self.balls:
                 ball.draw(canvas)
             for w in self.walls:
