@@ -1,7 +1,6 @@
 #### RUN ON WINDOWS ###
 import SimpleGUICS2Pygame.simpleguics2pygame as simplegui
 from Vector import Vector
-#control + BREAK to kill process, control + C does not work
 
 ### RUN ON CODESKULPTOR ###
 #import simplegui
@@ -23,12 +22,13 @@ currentLives = ""
 
 img = simplegui.load_image("slime.png")
 
-
 CANVAS_WIDTH = 800
 CANVAS_HEIGHT = 500
 interval = 100
+lifes = 3
 pause = False
-#####
+DelayCount = 0
+
 
 """
 Creates a randomomised properties for the balls
@@ -55,7 +55,7 @@ def vel_x():
 def vel_y():
     return random.randint(-2,2)
 
-######
+
 
 class Player:
     """
@@ -77,11 +77,10 @@ class Player:
         self.pos.add(self.vel)
         self.vel.multiply(0.85)
 
-#######
 
 class Keyboard:
     """
-    Detects button plresses
+    Detects button presses
     params: None
     Returns: None
     """
@@ -107,7 +106,7 @@ class Keyboard:
 
         elif key == simplegui.KEY_MAP['p'] and pause == False:
                 pause = True
-                
+
         elif key == simplegui.KEY_MAP['p'] and pause == True:
                 pause = False
 
@@ -127,8 +126,6 @@ class Keyboard:
         elif key == simplegui.KEY_MAP['down']:
             self.down = False
 
-
-#####
 
 class KBInteraction:
     """
@@ -194,6 +191,7 @@ class Wall:
                          self.color)
 
     def hitTest(self, ball):
+
             #left hit
         if self.x < CANVAS_WIDTH/2:
             self.normal = Vector(1,0)
@@ -225,8 +223,6 @@ class Wall:
         #print("fixme = {}".format(isHit))
         return isHit
 
-#####
-
 class Ball:
     """
     Creates each ball
@@ -240,24 +236,16 @@ class Ball:
         self.color = color
         self.border = 1
 
-        #width = 512
-        #height = 192
-        #columns = 3
-        #rows = 8
-#https://py3.codeskulptor.org/#user305_OeE5CQwr4D_2.py
-
-
-
-    def offset_l(self): # left
+    def offset_l(self): # left offset
         return self.pos.x - self.radius
 
-    def offset_r(self): # right
+    def offset_r(self): # right offset
         return self.pos.x + self.radius
 
-    def offset_t(self): # top
+    def offset_t(self): # top offset
         return self.pos.y - self.radius
 
-    def offset_b(self): # bottom
+    def offset_b(self): # bottom offset
         return self.pos.y + self.radius
 
 
@@ -356,6 +344,8 @@ class Interaction:
 
     #determines if a ball should be absorbed
     def absorb(self, b1, b2):
+        global lifes
+        global DelayCount
         if self.hit(b1, b2):
             absorb_1v2 = (b1, b2) in self.in_collision
             absorb_2v1 = (b2, b1) in self.in_collision
@@ -367,18 +357,27 @@ class Interaction:
                     if b2 in self.balls:
                         balls.remove(b2)
                         b2.radius = b2.radius + b1.radius/2
+
                     else:
-                        print("You were absorbed! GAME OVER")
 
                         ### LIFE COUNTER AND STATMENT HERE ###
                         # three lifes, update GUI/HUD
 
-                        ### DEATH ANIMATION HERE ###
-                        # set player color to red?
+                        print(DelayCount)
+                        DelayCount+= 1
+                        if DelayCount // 15:
+
+                            lifes = lifes - 1
+                            print("Life Lost! Lifes Left: " , lifes)
+                            DelayCount = 0
+                    if lifes == 0:
+                        print("You were absorbed! GAME OVER")
+                        print("Your score was: " , Player.radius)
                         exit()
 
 
     def absorb1(self, b1, b2):
+        global lifes
         if self.hit(b1, b2):
             absorb_1v2 = (b1, b2) in self.in_collision
             absorb_2v1 = (b2, b1) in self.in_collision
@@ -386,7 +385,6 @@ class Interaction:
                 if b1.radius < b2.radius:
                     powerUps.remove(b1)
                     typePowerUp = random.randint(1, 3)
-                    print(typePowerUp)
                     if typePowerUp == 1:
                         Player.vel = Player.vel * 5
                         print("Velocity PowerUp!")
@@ -394,9 +392,8 @@ class Interaction:
                         b2.radius = b2.radius * 1.5
                         print("Radius PowerUp!")
                     if typePowerUp == 3:
-                        pass
-                        print("Extra Life! (fixme)")
-                    print('here')
+                        lifes = lifes + 1
+                        print("Extra Life! Total lifes: " , lifes)
 
 
     def update(self):
@@ -421,6 +418,9 @@ class Interaction:
             if ball1.radius > self.player.radius:
                 self.absorb(ball1, self.player)
 
+        if len(balls) == 0:
+            print("YOU WON!")
+            exit()
 
         #Detect Player touching PowerUp items
     #    for ball1 in self.pups:
@@ -465,7 +465,7 @@ for i in range(num_powerups):
         powerUps.append(PowerUps(Vector(RandPosX(rad), RandPosY(rad)),Vector(vel_x(), vel_y()), rad))
 
 balls = []
-num_balls = 15
+num_balls = 30
 for i in range(num_balls):
 #   def timer_handler():
         rad = radius_random()
@@ -497,7 +497,6 @@ Player = Player(Vector(CANVAS_WIDTH/2,CANVAS_HEIGHT/2), 12.5)
 
 inter = KBInteraction(Player, kbd) #test player without balls getting in the way
 interaction = Interaction(balls, walls, kbd, Player, powerUps)
-
 
 ######
 
