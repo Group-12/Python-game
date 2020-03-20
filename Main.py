@@ -9,7 +9,9 @@ from Vector import Vector
 
 import random
 
-img = simplegui.load_image("slime.png")
+img = simplegui.load_image("http://www.cs.rhul.ac.uk/courses/CS1830/sprites/runnerSheet.png")
+#img = simplegui.load_image("https://i.imgur.com/mT2HJvW.png")
+
 width = 512
 height = 192
 columns = 8
@@ -248,13 +250,16 @@ class Ball:
 
     def draw(self, canvas):
         Ball.update_index()
-
         source_centre = (frame_width * frame_index[0] + frame_centre_x,
         frame_height * frame_index[1] + frame_centre_y)
+        #print (source_centre)
         source_size = (frame_width, frame_height)
-        dest_centre = (300, 150)
+        print(source_size)
+        dest_centre = (300, 300)
+        #print(dest_centre)
         # doesn't have to be same aspect ration as frame!
-        dest_size = (100, 100)
+        dest_size = (200, 200)
+        #canvas.draw_image(img, source_centre, source_size, dest_centre, dest_size)
         canvas.draw_image(img, source_centre, source_size, dest_centre, dest_size)
 
         '''
